@@ -1,0 +1,147 @@
+/* Decompiler 208ms, total 385ms, lines 147 */
+package com.lakutils.gui;
+
+import com.lakutils.LakUtils;
+import net.minecraft.class_2561;
+import net.minecraft.class_332;
+import net.minecraft.class_342;
+import net.minecraft.class_4185;
+import net.minecraft.class_437;
+
+public class BetScreen extends class_437 {
+   private class_342 usernameField;
+   private class_342 minBetField;
+   private class_342 maxBetField;
+   private class_342 multiplierField;
+
+   public BetScreen() {
+      super(class_2561.method_43470("LakUtils Config"));
+   }
+
+   protected void method_25426() {
+      int centerX = this.field_22789 / 2;
+      int startY = 50;
+      int fieldSpacing = 25;
+      this.usernameField = new class_342(this.field_22793, centerX - 100, startY, 200, 20, class_2561.method_43470("Username"));
+      this.usernameField.method_1880(16);
+      this.usernameField.method_1852(LakUtils.config.username);
+      this.method_25429(this.usernameField);
+      int currentY = startY + fieldSpacing;
+      this.minBetField = new class_342(this.field_22793, centerX - 100, currentY, 200, 20, class_2561.method_43470("Min Bet"));
+      this.minBetField.method_1880(10);
+      this.minBetField.method_1852(LakUtils.config.minBet);
+      this.method_25429(this.minBetField);
+      currentY += fieldSpacing;
+      this.maxBetField = new class_342(this.field_22793, centerX - 100, currentY, 200, 20, class_2561.method_43470("Max Bet"));
+      this.maxBetField.method_1880(10);
+      this.maxBetField.method_1852(LakUtils.config.maxBet);
+      this.method_25429(this.maxBetField);
+      currentY += fieldSpacing;
+      this.multiplierField = new class_342(this.field_22793, centerX - 100, currentY, 200, 20, class_2561.method_43470("Default Multiplier"));
+      this.multiplierField.method_1880(5);
+      this.multiplierField.method_1852(String.valueOf(LakUtils.config.defaultMultiplier));
+      this.method_25429(this.multiplierField);
+      currentY += fieldSpacing + 10;
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Title Color"), (button) -> {
+         this.field_22787.method_1507(new SimpleColorPickerScreen(LakUtils.config.titleColor, false, (color) -> {
+            LakUtils.config.titleColor = color;
+            this.field_22787.method_1507(this);
+         }));
+      }).method_46434(centerX - 100, currentY, 200, 20).method_46431());
+      currentY += fieldSpacing;
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Title Bar Color"), (button) -> {
+         this.field_22787.method_1507(new SimpleColorPickerScreen(LakUtils.config.titleBarColor, true, (color) -> {
+            LakUtils.config.titleBarColor = color;
+            this.field_22787.method_1507(this);
+         }));
+      }).method_46434(centerX - 100, currentY, 200, 20).method_46431());
+      currentY += fieldSpacing;
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Username Color"), (button) -> {
+         this.field_22787.method_1507(new SimpleColorPickerScreen(LakUtils.config.usernameColor, false, (color) -> {
+            LakUtils.config.usernameColor = color;
+            this.field_22787.method_1507(this);
+         }));
+      }).method_46434(centerX - 100, currentY, 200, 20).method_46431());
+      currentY += fieldSpacing;
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Min/Max Color"), (button) -> {
+         this.field_22787.method_1507(new SimpleColorPickerScreen(LakUtils.config.minMaxColor, false, (color) -> {
+            LakUtils.config.minMaxColor = color;
+            this.field_22787.method_1507(this);
+         }));
+      }).method_46434(centerX - 100, currentY, 200, 20).method_46431());
+      currentY += fieldSpacing + 10;
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Save"), (button) -> {
+         this.saveConfig();
+         LakUtils.config.load();
+         this.method_25419();
+      }).method_46434(centerX - 100, currentY, 95, 20).method_46431());
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Cancel"), (button) -> {
+         this.method_25419();
+      }).method_46434(centerX + 5, currentY, 95, 20).method_46431());
+   }
+
+   private void saveConfig() {
+      LakUtils.config.username = this.usernameField.method_1882();
+      LakUtils.config.minBet = this.minBetField.method_1882();
+      LakUtils.config.maxBet = this.maxBetField.method_1882();
+
+      try {
+         LakUtils.config.defaultMultiplier = Double.parseDouble(this.multiplierField.method_1882());
+      } catch (NumberFormatException var2) {
+         LakUtils.config.defaultMultiplier = 2.0D;
+      }
+
+      LakUtils.saveConfig();
+   }
+
+   public void method_25394(class_332 context, int mouseX, int mouseY, float delta) {
+      super.method_25394(context, mouseX, mouseY, delta);
+      int centerX = this.field_22789 / 2;
+      int startY = 50;
+      int fieldSpacing = 25;
+      context.method_25300(this.field_22793, "LakUtils Configuration", centerX, 20, 16777215);
+      context.method_25303(this.field_22793, "Username:", centerX - 100, startY - 10, 11184810);
+      this.usernameField.method_25394(context, mouseX, mouseY, delta);
+      int currentY = startY + fieldSpacing;
+      context.method_25303(this.field_22793, "Min Bet:", centerX - 100, currentY - 10, 11184810);
+      this.minBetField.method_25394(context, mouseX, mouseY, delta);
+      currentY += fieldSpacing;
+      context.method_25303(this.field_22793, "Max Bet:", centerX - 100, currentY - 10, 11184810);
+      this.maxBetField.method_25394(context, mouseX, mouseY, delta);
+      currentY += fieldSpacing;
+      context.method_25303(this.field_22793, "Default Multiplier:", centerX - 100, currentY - 10, 11184810);
+      this.multiplierField.method_25394(context, mouseX, mouseY, delta);
+   }
+
+   public boolean method_25402(double mouseX, double mouseY, int button) {
+      this.usernameField.method_25402(mouseX, mouseY, button);
+      this.minBetField.method_25402(mouseX, mouseY, button);
+      this.maxBetField.method_25402(mouseX, mouseY, button);
+      this.multiplierField.method_25402(mouseX, mouseY, button);
+      return super.method_25402(mouseX, mouseY, button);
+   }
+
+   public boolean method_25404(int keyCode, int scanCode, int modifiers) {
+      if (this.usernameField.method_25404(keyCode, scanCode, modifiers)) {
+         return true;
+      } else if (this.minBetField.method_25404(keyCode, scanCode, modifiers)) {
+         return true;
+      } else if (this.maxBetField.method_25404(keyCode, scanCode, modifiers)) {
+         return true;
+      } else {
+         return this.multiplierField.method_25404(keyCode, scanCode, modifiers) ? true : super.method_25404(keyCode, scanCode, modifiers);
+      }
+   }
+
+   public boolean method_25400(char chr, int modifiers) {
+      if (this.usernameField.method_25400(chr, modifiers)) {
+         return true;
+      } else if (this.minBetField.method_25400(chr, modifiers)) {
+         return true;
+      } else if (this.maxBetField.method_25400(chr, modifiers)) {
+         return true;
+      } else {
+         return this.multiplierField.method_25400(chr, modifiers) ? true : super.method_25400(chr, modifiers);
+      }
+   }
+}
