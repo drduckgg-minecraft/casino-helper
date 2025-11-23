@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "lakutils",
+  "version": "0.5.9",
+  "name": "LakUtils",
+  "description": "Casino bet management utility for DonutSMP",
+  "authors": [
+    "Lak"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/lakutils/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.lakutils.LakUtils"
+    ]
+  },
+  "mixins": [
+    "lakutils.mixins.json"
+  ],
+  "depends": {
+    "java": ">=21",
+    "minecraft": "1.21.3",
+    "fabricloader": ">=0.16.9"
+  }
+}
