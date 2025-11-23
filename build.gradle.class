@@ -1,0 +1,42 @@
+plugins {
+    id 'fabric-loom' version '1.2.+'
+    id 'java'
+}
+
+group = 'com.lakutils'
+version = '0.5.9'
+archivesBaseName = 'lakutils'
+
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.fabricmc.net/' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.4"
+    mappings loom.layered {
+        officialMojangMappings()
+    }
+    modImplementation "net.fabricmc:fabric-loader:0.16.9"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:1.91.0+1.21.4"
+}
+
+java {
+    withSourcesJar()
+}
+
+loom {
+    runs {
+        client {
+            workingDirectory project.file('run')
+            mods {
+                lakutils {
+                    sourceSets.main.output
+                }
+            }
+        }
+    }
+}
