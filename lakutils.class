@@ -1,0 +1,115 @@
+/* Decompiler 67ms, total 170ms, lines 115 */
+package com.lakutils;
+
+import com.lakutils.config.Config;
+import com.lakutils.gui.BetScreen;
+import com.lakutils.manager.BetManager;
+import java.io.File;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_3675.class_307;
+import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class LakUtils implements ClientModInitializer {
+   public static final String MOD_ID = "lakutils";
+   public static final Logger LOGGER = LoggerFactory.getLogger("lakutils");
+   public static class_310 mc;
+   public static final File CONFIG_DIR = new File("config/lakutils");
+   private static class_304 openGuiKey;
+   private static class_304 moveGuiKey;
+   private static class_304 configKey;
+   public static BetManager betManager;
+   public static Config config;
+
+   public void onInitializeClient() {
+      LOGGER.info("Initializing LakUtils");
+      mc = class_310.method_1551();
+      if (!CONFIG_DIR.exists()) {
+         CONFIG_DIR.mkdirs();
+      }
+
+      config = new Config();
+      config.load();
+      betManager = new BetManager();
+      openGuiKey = KeyBindingHelper.registerKeyBinding(new class_304("key.lakutils.open_gui", class_307.field_1668, 344, "category.lakutils"));
+      moveGuiKey = KeyBindingHelper.registerKeyBinding(new class_304("key.lakutils.move_gui", class_307.field_1668, 342, "category.lakutils"));
+      configKey = KeyBindingHelper.registerKeyBinding(new class_304("key.lakutils.config", class_307.field_1668, 345, "category.lakutils"));
+      ClientTickEvents.END_CLIENT_TICK.register((client) -> {
+         if (openGuiKey.method_1436()) {
+            betManager.toggleEnabled();
+         }
+
+         if (moveGuiKey.method_1436()) {
+            betManager.toggleMoveMode();
+         }
+
+         if (configKey.method_1436() && client.field_1755 == null) {
+            client.method_1507(new BetScreen());
+         }
+
+         if (betManager.isMoveMode() && client.field_1755 == null) {
+            long windowHandle = client.method_22683().method_4490();
+            boolean shiftPressed = GLFW.glfwGetKey(windowHandle, 340) == 1 || GLFW.glfwGetKey(windowHandle, 344) == 1;
+            if (shiftPressed) {
+               if (GLFW.glfwGetKey(windowHandle, 61) == 1) {
+                  config.guiScale = Math.min(config.guiScale + 0.05F, 3.0F);
+
+                  try {
+                     Thread.sleep(50L);
+                  } catch (InterruptedException var6) {
+                  }
+               }
+
+               if (GLFW.glfwGetKey(windowHandle, 45) == 1) {
+                  config.guiScale = Math.max(config.guiScale - 0.05F, 0.5F);
+
+                  try {
+                     Thread.sleep(50L);
+                  } catch (InterruptedException var5) {
+                  }
+               }
+            } else {
+               int moveSpeed = 5;
+               Config var10000;
+               if (GLFW.glfwGetKey(windowHandle, 263) == 1) {
+                  var10000 = config;
+                  var10000.guiX -= moveSpeed;
+               }
+
+               if (GLFW.glfwGetKey(windowHandle, 262) == 1) {
+                  var10000 = config;
+                  var10000.guiX += moveSpeed;
+               }
+
+               if (GLFW.glfwGetKey(windowHandle, 265) == 1) {
+                  var10000 = config;
+                  var10000.guiY -= moveSpeed;
+               }
+
+               if (GLFW.glfwGetKey(windowHandle, 264) == 1) {
+                  var10000 = config;
+                  var10000.guiY += moveSpeed;
+               }
+            }
+         }
+
+      });
+      ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+         if (!overlay) {
+            betManager.onChatMessage(message.getString());
+         }
+
+      });
+      LOGGER.info("LakUtils initialized successfully");
+   }
+
+   public static void saveConfig() {
+      config.save();
+   }
+}
