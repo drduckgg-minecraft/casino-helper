@@ -1,0 +1,92 @@
+/* Decompiler 58ms, total 184ms, lines 92 */
+package com.lakutils.config;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.lakutils.LakUtils;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+
+public class Config {
+   private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
+   private static final File CONFIG_FILE;
+   public String username = "Lak";
+   public String minBet = "100K";
+   public String maxBet = "25M";
+   public double defaultMultiplier = 2.0D;
+   public int guiX = 10;
+   public int guiY = 10;
+   public float guiScale = 1.0F;
+   public int titleColor = 65280;
+   public int titleBarColor = -16711936;
+   public int usernameColor = 11184810;
+   public int minMaxColor = 11184810;
+
+   public void load() {
+      if (!CONFIG_FILE.exists()) {
+         this.save();
+      } else {
+         try {
+            FileReader reader = new FileReader(CONFIG_FILE);
+
+            try {
+               Config loaded = (Config)GSON.fromJson(reader, Config.class);
+               if (loaded != null) {
+                  this.username = loaded.username;
+                  this.minBet = loaded.minBet;
+                  this.maxBet = loaded.maxBet;
+                  this.defaultMultiplier = loaded.defaultMultiplier;
+                  this.guiX = loaded.guiX;
+                  this.guiY = loaded.guiY;
+                  this.guiScale = loaded.guiScale;
+                  this.titleColor = loaded.titleColor;
+                  this.titleBarColor = loaded.titleBarColor;
+                  this.usernameColor = loaded.usernameColor;
+                  this.minMaxColor = loaded.minMaxColor;
+               }
+            } catch (Throwable var5) {
+               try {
+                  reader.close();
+               } catch (Throwable var4) {
+                  var5.addSuppressed(var4);
+               }
+
+               throw var5;
+            }
+
+            reader.close();
+         } catch (Exception var6) {
+            LakUtils.LOGGER.error("Failed to load config", var6);
+         }
+
+      }
+   }
+
+   public void save() {
+      try {
+         FileWriter writer = new FileWriter(CONFIG_FILE);
+
+         try {
+            GSON.toJson(this, writer);
+         } catch (Throwable var5) {
+            try {
+               writer.close();
+            } catch (Throwable var4) {
+               var5.addSuppressed(var4);
+            }
+
+            throw var5;
+         }
+
+         writer.close();
+      } catch (Exception var6) {
+         LakUtils.LOGGER.error("Failed to save config", var6);
+      }
+
+   }
+
+   static {
+      CONFIG_FILE = new File(LakUtils.CONFIG_DIR, "config.json");
+   }
+}
