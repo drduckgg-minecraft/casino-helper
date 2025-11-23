@@ -1,0 +1,154 @@
+/* Decompiler 133ms, total 235ms, lines 154 */
+package com.lakutils.manager;
+
+import com.lakutils.LakUtils;
+import com.lakutils.model.Bet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class BetManager {
+   private static final Pattern PAYMENT_PATTERN = Pattern.compile("^(.+?) paid you \\$?([0-9.]+)([KMB])\\.?$");
+   private final List<Bet> activeBets = new ArrayList();
+   private final Map<String, Long> lifetimeTotals = new HashMap();
+   private boolean enabled = false;
+   private boolean moveMode = false;
+   private String highestRoller = "";
+   private long highestRollerAmount = 0L;
+
+   public void onChatMessage(String message) {
+      if (this.enabled) {
+         Matcher matcher = PAYMENT_PATTERN.matcher(message);
+         if (matcher.matches()) {
+            String playerName = matcher.group(1);
+            double value = Double.parseDouble(matcher.group(2));
+            String suffix = matcher.group(3);
+            long amount = this.parseAmount(value, suffix);
+            long minBet = this.parseAmountString(LakUtils.config.minBet);
+            long maxBet = this.parseAmountString(LakUtils.config.maxBet);
+            if (amount < minBet || amount > maxBet) {
+               return;
+            }
+
+            this.lifetimeTotals.put(playerName, (Long)this.lifetimeTotals.getOrDefault(playerName, 0L) + amount);
+            long playerTotal = (Long)this.lifetimeTotals.get(playerName);
+            if (playerTotal > this.highestRollerAmount) {
+               this.highestRoller = playerName;
+               this.highestRollerAmount = playerTotal;
+            }
+
+            Bet bet = new Bet(playerName, amount);
+            this.activeBets.add(bet);
+         }
+
+      }
+   }
+
+   public void removeBet(Bet bet) {
+      this.activeBets.remove(bet);
+   }
+
+   public void resetBet(Bet bet) {
+      this.activeBets.remove(bet);
+   }
+
+   public long getLifetimeTotal(String playerName) {
+      return (Long)this.lifetimeTotals.getOrDefault(playerName, 0L);
+   }
+
+   public List<Bet> getActiveBets() {
+      return this.activeBets;
+   }
+
+   public boolean isEnabled() {
+      return this.enabled;
+   }
+
+   public void toggleEnabled() {
+      this.enabled = !this.enabled;
+   }
+
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
+   }
+
+   public boolean isMoveMode() {
+      return this.moveMode;
+   }
+
+   public void toggleMoveMode() {
+      this.moveMode = !this.moveMode;
+   }
+
+   public void setMoveMode(boolean moveMode) {
+      this.moveMode = moveMode;
+   }
+
+   public String getHighestRoller() {
+      return this.highestRoller;
+   }
+
+   public long getHighestRollerAmount() {
+      return this.highestRollerAmount;
+   }
+
+   private long parseAmount(double value, String suffix) {
+      byte var5 = -1;
+      switch(suffix.hashCode()) {
+      case 66:
+         if (suffix.equals("B")) {
+            var5 = 2;
+         }
+         break;
+      case 75:
+         if (suffix.equals("K")) {
+            var5 = 0;
+         }
+         break;
+      case 77:
+         if (suffix.equals("M")) {
+            var5 = 1;
+         }
+      }
+
+      long var10000;
+      switch(var5) {
+      case 0:
+         var10000 = (long)(value * 1000.0D);
+         break;
+      case 1:
+         var10000 = (long)(value * 1000000.0D);
+         break;
+      case 2:
+         var10000 = (long)(value * 1.0E9D);
+         break;
+      default:
+         var10000 = (long)value;
+      }
+
+      return var10000;
+   }
+
+   private long parseAmountString(String str) {
+      if (str != null && !str.isEmpty()) {
+         String upper = str.toUpperCase().trim();
+         char lastChar = upper.charAt(upper.length() - 1);
+
+         try {
+            if (lastChar != 'K' && lastChar != 'M' && lastChar != 'B') {
+               return Long.parseLong(upper);
+            } else {
+               double value = Double.parseDouble(upper.substring(0, upper.length() - 1));
+               return this.parseAmount(value, String.valueOf(lastChar));
+            }
+         } catch (NumberFormatException var6) {
+            return 0L;
+         }
+      } else {
+         return 0L;
+      }
+   }
+}
