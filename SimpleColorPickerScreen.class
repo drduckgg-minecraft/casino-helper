@@ -1,0 +1,109 @@
+/* Decompiler 194ms, total 306ms, lines 109 */
+package com.lakutils.gui;
+
+import java.util.function.Consumer;
+import net.minecraft.class_2561;
+import net.minecraft.class_332;
+import net.minecraft.class_357;
+import net.minecraft.class_4185;
+import net.minecraft.class_437;
+
+public class SimpleColorPickerScreen extends class_437 {
+   private final Consumer<Integer> onConfirm;
+   private final int initialColor;
+   private int red;
+   private int green;
+   private int blue;
+   private int alpha;
+   private SimpleColorPickerScreen.RGBSlider redSlider;
+   private SimpleColorPickerScreen.RGBSlider greenSlider;
+   private SimpleColorPickerScreen.RGBSlider blueSlider;
+   private SimpleColorPickerScreen.RGBSlider alphaSlider;
+
+   public SimpleColorPickerScreen(int initialColor, boolean hasAlpha, Consumer<Integer> onConfirm) {
+      super(class_2561.method_43470("Choose Color"));
+      this.onConfirm = onConfirm;
+      this.initialColor = initialColor;
+      if (hasAlpha) {
+         this.alpha = initialColor >> 24 & 255;
+         this.red = initialColor >> 16 & 255;
+         this.green = initialColor >> 8 & 255;
+         this.blue = initialColor & 255;
+      } else {
+         this.alpha = 255;
+         this.red = initialColor >> 16 & 255;
+         this.green = initialColor >> 8 & 255;
+         this.blue = initialColor & 255;
+      }
+
+   }
+
+   protected void method_25426() {
+      int centerX = this.field_22789 / 2;
+      int startY = this.field_22790 / 2 - 60;
+      int sliderWidth = 200;
+      this.redSlider = new SimpleColorPickerScreen.RGBSlider(centerX - sliderWidth / 2, startY, sliderWidth, 20, class_2561.method_43470("Red: " + this.red), (double)this.red / 255.0D, (value) -> {
+         this.red = (int)(value * 255.0D);
+      });
+      this.method_37063(this.redSlider);
+      this.greenSlider = new SimpleColorPickerScreen.RGBSlider(centerX - sliderWidth / 2, startY + 30, sliderWidth, 20, class_2561.method_43470("Green: " + this.green), (double)this.green / 255.0D, (value) -> {
+         this.green = (int)(value * 255.0D);
+      });
+      this.method_37063(this.greenSlider);
+      this.blueSlider = new SimpleColorPickerScreen.RGBSlider(centerX - sliderWidth / 2, startY + 60, sliderWidth, 20, class_2561.method_43470("Blue: " + this.blue), (double)this.blue / 255.0D, (value) -> {
+         this.blue = (int)(value * 255.0D);
+      });
+      this.method_37063(this.blueSlider);
+      if ((this.initialColor & -16777216) != 0 || this.alpha != 255) {
+         this.alphaSlider = new SimpleColorPickerScreen.RGBSlider(centerX - sliderWidth / 2, startY + 90, sliderWidth, 20, class_2561.method_43470("Alpha: " + this.alpha), (double)this.alpha / 255.0D, (value) -> {
+            this.alpha = (int)(value * 255.0D);
+         });
+         this.method_37063(this.alphaSlider);
+      }
+
+      int buttonY = this.alphaSlider != null ? startY + 130 : startY + 100;
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("OK"), (button) -> {
+         int color = this.alphaSlider != null ? (this.alpha & 255) << 24 | (this.red & 255) << 16 | (this.green & 255) << 8 | this.blue & 255 : (this.red & 255) << 16 | (this.green & 255) << 8 | this.blue & 255;
+         this.onConfirm.accept(color);
+         this.method_25419();
+      }).method_46434(centerX - 100, buttonY, 95, 20).method_46431());
+      this.method_37063(class_4185.method_46430(class_2561.method_43470("Cancel"), (button) -> {
+         this.method_25419();
+      }).method_46434(centerX + 5, buttonY, 95, 20).method_46431());
+   }
+
+   public void method_25394(class_332 context, int mouseX, int mouseY, float delta) {
+      super.method_25394(context, mouseX, mouseY, delta);
+      int centerX = this.field_22789 / 2;
+      int startY = this.field_22790 / 2 - 60;
+      this.redSlider.method_25355(class_2561.method_43470("Red: " + this.red));
+      this.greenSlider.method_25355(class_2561.method_43470("Green: " + this.green));
+      this.blueSlider.method_25355(class_2561.method_43470("Blue: " + this.blue));
+      if (this.alphaSlider != null) {
+         this.alphaSlider.method_25355(class_2561.method_43470("Alpha: " + this.alpha));
+      }
+
+      int previewY = this.alphaSlider != null ? startY + 120 : startY + 90;
+      int currentColor = this.alphaSlider != null ? (this.alpha & 255) << 24 | (this.red & 255) << 16 | (this.green & 255) << 8 | this.blue & 255 : -16777216 | (this.red & 255) << 16 | (this.green & 255) << 8 | this.blue & 255;
+      context.method_25294(centerX - 50, previewY - 25, centerX + 50, previewY - 5, currentColor);
+      context.method_49601(centerX - 50, previewY - 25, 100, 20, -1);
+      String hexValue = this.alphaSlider != null ? String.format("%08X", currentColor) : String.format("%06X", currentColor & 16777215);
+      context.method_25300(this.field_22793, "Hex: " + hexValue, centerX, previewY - 35, 16777215);
+   }
+
+   private static class RGBSlider extends class_357 {
+      private final Consumer<Double> onChange;
+
+      public RGBSlider(int x, int y, int width, int height, class_2561 message, double value, Consumer<Double> onChange) {
+         super(x, y, width, height, message, value);
+         this.onChange = onChange;
+      }
+
+      protected void method_25346() {
+      }
+
+      protected void method_25344() {
+         this.onChange.accept(this.field_22753);
+      }
+   }
+}
