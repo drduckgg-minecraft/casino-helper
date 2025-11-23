@@ -1,0 +1,55 @@
+/* Decompiler 39ms, total 130ms, lines 55 */
+package com.lakutils.model;
+
+public class Bet {
+   private final String playerName;
+   private long amount;
+   private long totalPaid;
+
+   public Bet(String playerName, long amount) {
+      this.playerName = playerName;
+      this.amount = amount;
+      this.totalPaid = amount;
+   }
+
+   public String getPlayerName() {
+      return this.playerName;
+   }
+
+   public long getAmount() {
+      return this.amount;
+   }
+
+   public void addAmount(long additional) {
+      this.amount += additional;
+      this.totalPaid += additional;
+   }
+
+   public long getTotalPaid() {
+      return this.totalPaid;
+   }
+
+   public String getFormattedAmount() {
+      return formatMoney(this.amount);
+   }
+
+   public String getFormattedTotalPaid() {
+      return formatMoney(this.totalPaid);
+   }
+
+   public static String formatMoney(long amount) {
+      double thousands;
+      if (amount >= 1000000000L) {
+         thousands = (double)amount / 1.0E9D;
+         return String.format("%.1fB", thousands);
+      } else if (amount >= 1000000L) {
+         thousands = (double)amount / 1000000.0D;
+         return String.format("%.1fM", thousands);
+      } else if (amount >= 1000L) {
+         thousands = (double)amount / 1000.0D;
+         return String.format("%.1fK", thousands);
+      } else {
+         return String.valueOf(amount);
+      }
+   }
+}
