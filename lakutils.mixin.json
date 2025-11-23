@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.lakutils.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "InGameHudMixin",
+    "MouseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "lakutils-refmap.json"
+}
