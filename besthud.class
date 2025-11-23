@@ -1,0 +1,185 @@
+/* Decompiler 282ms, total 376ms, lines 185 */
+package com.lakutils.gui;
+
+import com.lakutils.LakUtils;
+import com.lakutils.model.Bet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import net.minecraft.class_310;
+import net.minecraft.class_332;
+import net.minecraft.class_437;
+
+public class BetHud {
+   private static final int BUTTON_WIDTH = 30;
+   private static final int BUTTON_HEIGHT = 16;
+   private static final int PADDING = 4;
+   private static final int ROW_HEIGHT = 24;
+   private static BetHud INSTANCE;
+   private String hoveredButton = null;
+   private Bet hoveredBet = null;
+
+   public static BetHud getInstance() {
+      if (INSTANCE == null) {
+         INSTANCE = new BetHud();
+      }
+
+      return INSTANCE;
+   }
+
+   public void render(class_332 context, int mouseX, int mouseY) {
+      class_310 mc = LakUtils.mc;
+      if (mc != null && mc.field_1724 != null) {
+         if (LakUtils.betManager.isEnabled()) {
+            float scale = LakUtils.config.guiScale;
+            context.method_51448().method_22903();
+            context.method_51448().method_22905(scale, scale, 1.0F);
+            int scaledMouseX = (int)((float)mouseX / scale);
+            int scaledMouseY = (int)((float)mouseY / scale);
+            int x = (int)((float)LakUtils.config.guiX / scale);
+            int y = (int)((float)LakUtils.config.guiY / scale);
+            List<Bet> bets = LakUtils.betManager.getActiveBets();
+            int width = 250;
+            int headerHeight = 50;
+            int contentHeight = bets.size() * 24;
+            int totalHeight = headerHeight + contentHeight + 8;
+            context.method_25294(x, y, x + width, y + totalHeight, -872415232);
+            context.method_25294(x, y, x + width, y + 2, LakUtils.config.titleBarColor);
+            String title = "DonutSMP Casino Helper";
+            context.method_25303(mc.field_1772, title, x + 4, y + 4, LakUtils.config.titleColor);
+            String minMax = "Min " + LakUtils.config.minBet + " | Max " + LakUtils.config.maxBet;
+            context.method_25303(mc.field_1772, minMax, x + 4, y + 4 + 10, LakUtils.config.minMaxColor);
+            String username = "Username: " + LakUtils.config.username;
+            context.method_25303(mc.field_1772, username, x + 4, y + 4 + 20, LakUtils.config.usernameColor);
+            String highestRoller = LakUtils.betManager.getHighestRoller();
+            if (!highestRoller.isEmpty()) {
+               String rollerText = "Top Wagered: " + highestRoller + " (" + Bet.formatMoney(LakUtils.betManager.getHighestRollerAmount()) + ")";
+               context.method_25303(mc.field_1772, rollerText, x + 4, y + 4 + 30, 16766720);
+            }
+
+            int currentY = y + headerHeight;
+            this.hoveredButton = null;
+            this.hoveredBet = null;
+
+            for(Iterator var20 = bets.iterator(); var20.hasNext(); currentY += 24) {
+               Bet bet = (Bet)var20.next();
+               String var10000 = bet.getPlayerName();
+               String betText = "★ " + var10000 + ": " + bet.getFormattedAmount();
+               context.method_25303(mc.field_1772, betText, x + 4, currentY + 4, 16777215);
+               long lifetimeTotal = LakUtils.betManager.getLifetimeTotal(bet.getPlayerName());
+               String totalText = "Total Paid: " + Bet.formatMoney(lifetimeTotal);
+               context.method_25303(mc.field_1772, totalText, x + 4, currentY - 6, 65280);
+               int winX = x + width - 60 - 8;
+               int winY = currentY + 4;
+               boolean winHovered = this.isMouseOver(scaledMouseX, scaledMouseY, winX, winY, 30, 16);
+               this.drawButton(context, "Win", winX, winY, 30, 16, winHovered, -16733696);
+               if (winHovered) {
+                  this.hoveredButton = "win";
+                  this.hoveredBet = bet;
+               }
+
+               int loseX = x + width - 30 - 4;
+               int loseY = currentY + 4;
+               boolean loseHovered = this.isMouseOver(scaledMouseX, scaledMouseY, loseX, loseY, 30, 16);
+               this.drawButton(context, "Lose", loseX, loseY, 30, 16, loseHovered, -5636096);
+               if (loseHovered) {
+                  this.hoveredButton = "lose";
+                  this.hoveredBet = bet;
+               }
+            }
+
+            if (LakUtils.betManager.isMoveMode()) {
+               String moveText = "[MOVE MODE - Use Arrow Keys | Shift +/- to Scale]";
+               context.method_25303(mc.field_1772, moveText, x + width / 2 - mc.field_1772.method_1727(moveText) / 2, y - 12, 16776960);
+            }
+
+            context.method_51448().method_22909();
+         }
+      }
+   }
+
+   private void drawButton(class_332 context, String text, int x, int y, int width, int height, boolean hovered, int color) {
+      int bgColor = hovered ? color | -16777216 : color & -1996488705;
+      context.method_25294(x, y, x + width, y + height, bgColor);
+      context.method_25294(x, y, x + width, y + 1, -1);
+      context.method_25294(x, y, x + 1, y + height, -1);
+      context.method_25294(x + width - 1, y, x + width, y + height, -16777216);
+      context.method_25294(x, y + height - 1, x + width, y + height, -16777216);
+      class_310 mc = LakUtils.mc;
+      int textX = x + (width - mc.field_1772.method_1727(text)) / 2;
+      Objects.requireNonNull(mc.field_1772);
+      int textY = y + (height - 9) / 2;
+      context.method_25303(mc.field_1772, text, textX, textY, 16777215);
+   }
+
+   private boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
+      return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+   }
+
+   public boolean mouseClicked(double mouseX, double mouseY, int button) {
+      if (!LakUtils.betManager.isEnabled()) {
+         return false;
+      } else {
+         class_310 mc = LakUtils.mc;
+         float scale = LakUtils.config.guiScale;
+         int scaledMouseX = (int)(mouseX / (double)scale);
+         int scaledMouseY = (int)(mouseY / (double)scale);
+         if (button == 0) {
+            int x = (int)((float)LakUtils.config.guiX / scale);
+            int y = (int)((float)LakUtils.config.guiY / scale);
+            int width = 250;
+            int headerHeight = 50;
+            int currentY = y + headerHeight;
+            List<Bet> bets = LakUtils.betManager.getActiveBets();
+
+            for(Iterator var16 = bets.iterator(); var16.hasNext(); currentY += 24) {
+               Bet bet = (Bet)var16.next();
+               int winX = x + width - 60 - 8;
+               int winY = currentY + 4;
+               if (this.isMouseOver(scaledMouseX, scaledMouseY, winX, winY, 30, 16)) {
+                  this.handleWinClick(bet);
+                  return true;
+               }
+
+               int loseX = x + width - 30 - 4;
+               int loseY = currentY + 4;
+               if (this.isMouseOver(scaledMouseX, scaledMouseY, loseX, loseY, 30, 16)) {
+                  this.handleLoseClick(bet);
+                  return true;
+               }
+            }
+         }
+
+         return false;
+      }
+   }
+
+   public boolean mouseReleased(double mouseX, double mouseY, int button) {
+      return false;
+   }
+
+   public void mouseMoved(double mouseX, double mouseY) {
+   }
+
+   private void handleWinClick(Bet bet) {
+      class_310 mc = LakUtils.mc;
+      MultiplierScreen multiplierScreen = new MultiplierScreen((multiplier) -> {
+         long payout = (long)((double)bet.getAmount() * multiplier);
+         String payoutStr = Bet.formatMoney(payout);
+         String var10000 = bet.getPlayerName();
+         String command = "/pay " + var10000 + " " + payoutStr;
+         class_437 patt0$temp = mc.field_1755;
+         if (patt0$temp instanceof MultiplierScreen) {
+            MultiplierScreen screen = (MultiplierScreen)patt0$temp;
+            screen.setCommandToExecute(command);
+         }
+
+         LakUtils.betManager.removeBet(bet);
+      });
+      mc.method_1507(multiplierScreen);
+   }
+
+   private void handleLoseClick(Bet bet) {
+      LakUtils.betManager.removeBet(bet);
+   }
+}
